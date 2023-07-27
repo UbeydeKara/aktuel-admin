@@ -1,31 +1,16 @@
-import {
-    Autocomplete,
-    Button,
-    createFilterOptions,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    Select,
-    Stack,
-    TextField,
-    Typography
-} from "@mui/material";
 import {useState} from "react";
+
+import {Button, Dialog, DialogActions, DialogContent, MenuItem, Select, Stack, Typography} from "@mui/material";
+
 import {DatePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterMoment} from '@mui/x-date-pickers/AdapterMoment';
 import 'moment/locale/tr';
-import MenuItem from "@mui/material/MenuItem";
+
+import {AutoCompleteField} from "../component";
 
 export default function Record({open, setOpen, markets, handleSave}) {
     const [values, setValues] = useState({});
     const [market, setMarket] = useState(-1);
-    const filter = createFilterOptions()
-
-    const textfieldChange = (event) => {
-        const name = event.target.name;
-        const value = event.target.value;
-        setValues({...values, [name]: value});
-    };
 
     const dateChange = (event, name) => {
         const value = event._d;
@@ -49,10 +34,6 @@ export default function Record({open, setOpen, markets, handleSave}) {
         setOpen(false);
     }
 
-    const autoCompleteChange = (event, newValue) => {
-        setValues({...values, products: newValue});
-    }
-
     return (
         <Dialog
             open={open}
@@ -62,16 +43,13 @@ export default function Record({open, setOpen, markets, handleSave}) {
                 <Stack spacing={2} mb={1} px={2}>
                     <Typography variant="h4" mb={4}>Yeni Katalog</Typography>
 
-                    <Stack direction={{xs: "column", sm: "row"}} spacing={2}>
-                        <Select value={market}
-                                name="market" onChange={selectChange} fullWidth displayEmpty>
-                            <MenuItem value={-1} disabled>Market</MenuItem>
-                            {markets.map(item => {
-                                return <MenuItem key={item.marketID} value={item.marketID}>{item.title}</MenuItem>
-                            })}
-                        </Select>
-                        <TextField label="Katalog Görsel" name="img_path" onChange={textfieldChange} fullWidth/>
-                    </Stack>
+                    <Select value={market}
+                            name="market" onChange={selectChange} fullWidth displayEmpty>
+                        <MenuItem value={-1} disabled>Market</MenuItem>
+                        {markets.map(item => {
+                            return <MenuItem key={item.marketID} value={item.marketID}>{item.title}</MenuItem>
+                        })}
+                    </Select>
 
                     <Stack direction={{xs: "column", sm: "row"}} spacing={2}>
                         <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale="tr">
@@ -87,42 +65,16 @@ export default function Record({open, setOpen, markets, handleSave}) {
                                 sx={{width: "100%"}}/>
                         </LocalizationProvider>
                     </Stack>
-                    <Autocomplete
-                        options={[]}
-                        fullWidth
-                        multiple
-                        filterOptions={(options, params) => {
-                            const filtered = filter(options, params);
-
-                            const {inputValue} = params;
-                            const isExisting = options.some((option) => inputValue === option.img_path);
-
-                            if (inputValue !== '' && !isExisting) {
-                                filtered.push({
-                                    img_path: inputValue
-                                });
-                            }
-
-                            return filtered;
-                        }}
-                        getOptionLabel={(option) => {
-                            if (option.inputValue) {
-                                return option.inputValue;
-                            }
-                            return option.img_path;
-                        }}
-                        renderOption={(props, option) =>
-                            <img {...props} src={option.img_path} alt="Sevde" loading="lazy"/>}
-
-                        onChange={autoCompleteChange}
-
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                label="Ürün Görselleri"
-                            />
-                        )}
-                    />
+                    <AutoCompleteField
+                        field="images"
+                        label="Katalog Görselleri"
+                        values={values}
+                        setValues={setValues}/>
+                    <AutoCompleteField
+                        field="products"
+                        label="Ürün Görselleri"
+                        values={values}
+                        setValues={setValues}/>
                 </Stack>
             </DialogContent>
             <DialogActions>

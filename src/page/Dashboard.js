@@ -3,12 +3,9 @@ import {useEffect, useState} from 'react';
 import {Badge, Fade, Typography} from "@mui/material";
 import UserAvatar from "../component/UserAvatar";
 import OverlayCard from "../component/OverlayCard";
-import CatalogService from "../service/catalog-service";
-import Record from "../section/Record";
-import Markets from "../section/Markets";
-import DashboardTable from "../section/DashboardTable";
-import ImageZoom from "../component/ImageZoom";
 import SweetAlert from "../component/SweetAlert";
+import {DashboardTable, ImageUpdateForm, Markets, Record} from "../section";
+import {CatalogService, MarketService} from "../service";
 
 export default function Dashboard() {
 
@@ -44,11 +41,11 @@ export default function Dashboard() {
     };
 
     const handleGetMarkets = async () => {
-        await CatalogService.getMarkets().then(
+        await MarketService.getMarkets().then(
             (res) => {
                 const marketResponse = res.data.data;
                 setMarkets(marketResponse);
-                setSelectedMarket(marketResponse[0]);
+                setSelectedMarket(marketResponse[0].marketID);
             }
         ).catch(
             (err) => {
@@ -57,13 +54,12 @@ export default function Dashboard() {
         )
     };
 
-    const handleSave = async (newRow) => {
-        await CatalogService.save(newRow).then(
+    const handleSave = async (row) => {
+        const updateRequest = {...row, marketID: row.market.marketID}
+        await CatalogService.save(updateRequest).then(
             (res) => {
-                if (newRow.market.marketID === selectedMarket) {
-                    const newState = [...data, res.data.data];
-                    setData(newState);
-                }
+                const newState = [...data, res.data.data];
+                setData(newState);
             }
         ).catch(
             (res) => {
@@ -73,11 +69,15 @@ export default function Dashboard() {
     }
 
     const handleUpdate = async (row) => {
-        await CatalogService.update(row).catch(
-            (err) => {
-                setAlert(true);
-            }
-        )
+        const updateRequest = {...row, marketID: row.market.marketID}
+        await CatalogService.update(updateRequest).then((res) => {
+            const newState = data.map(obj => {
+                if (obj.catalogID === updateRequest.catalogID)
+                    return res.data.data;
+                return obj;
+            });
+            setData(newState);
+        })
     }
 
     const handleDelete = async (selectedRows) => {
@@ -114,6 +114,7 @@ export default function Dashboard() {
 
                 <Markets
                     markets={markets}
+                    setMarkets={setMarkets}
                     selectedMarket={selectedMarket}
                     setSelectedMarket={setSelectedMarket}/>
 
@@ -131,7 +132,7 @@ export default function Dashboard() {
                     setOpen={setRecordOpen}
                     handleSave={handleSave}/>
 
-                <ImageZoom
+                <ImageUpdateForm
                     selectedRow={selectedRow}
                     setSelectedRow={setSelectedRow}
                     handleUpdate={handleUpdate}/>

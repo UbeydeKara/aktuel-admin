@@ -10,9 +10,13 @@ export default function DashboardTable({data, handleUpdate, handleDelete, setSel
         { field: 'catalogID', headerName: 'ID', flex: 1, minWidth: 120 },
         { field: 'market', headerName: 'Market', flex: 1, minWidth: 120,
             valueFormatter: (params) => `${params.value.title}` },
-        { field: 'img_path', headerName: 'Katalog', flex: 1, minWidth: 120,
+        { field: 'images', headerName: 'Kataloglar', flex: 1, minWidth: 120,
             renderCell: (params) =>
-                <img src={params.value} alt="Sevde" width="100%" style={{objectFit: "contain"}}
+                <img src={params.value[0]} alt="Sevde" width="100%" style={{objectFit: "contain"}}
+                     loading="lazy"/>},
+        { field: 'products', headerName: 'Ürünler', flex: 1, minWidth: 120,
+            renderCell: (params) =>
+                <img src={params.value[0]} alt="Sevde" width="100%" style={{objectFit: "contain"}}
                      loading="lazy"/>},
         { field: 'startAt', headerName: 'Kampanya Başlangıç', editable: true, flex: 1, minWidth: 150, type: 'date',
             valueFormatter: (params) =>
@@ -27,8 +31,8 @@ export default function DashboardTable({data, handleUpdate, handleDelete, setSel
     };
 
     const handleCellClick = (params) => {
-        if (params.field === "img_path") {
-            setSelectedRow(params.row);
+        if (params.field === "images" || params.field === "products") {
+            setSelectedRow({...params.row, field: params.field});
         }
     }
 

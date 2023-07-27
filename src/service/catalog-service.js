@@ -1,30 +1,25 @@
 import http from "./http-common";
 
-const catalogUrl = "/catalog"
-const marketUrl = "/market"
+const serviceUrl = "/catalog"
 
 const getAll = () => {
-    return http.get(catalogUrl);
+    return http.get(serviceUrl);
 };
 
-const findAllByMarket = (market) => {
-    return http.post(catalogUrl + "/market", market);
-};
-
-const getMarkets = () => {
-    return http.get(marketUrl);
+const findAllByMarket = (marketID) => {
+    return http.get(serviceUrl + "/market/" + marketID);
 };
 
 const save = (catalog) => {
-    return http.post(catalogUrl, catalog);
+    return http.post(serviceUrl + "/save", catalog);
 }
 
 const update = (catalog) => {
-    return http.put(catalogUrl, catalog);
+    return http.put(serviceUrl + "/update", catalog);
 }
 
 const deleteByIds = (catalogIds) => {
-    return http.delete(catalogUrl, {
+    return http.delete(serviceUrl, {
         params: {catalogIDs: catalogIds},
         paramsSerializer: {
             indexes: null
@@ -35,7 +30,6 @@ const deleteByIds = (catalogIds) => {
 const CatalogService = {
     getAll,
     findAllByMarket,
-    getMarkets,
     save,
     update,
     deleteByIds
