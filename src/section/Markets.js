@@ -22,8 +22,8 @@ export default function Markets({markets, setMarkets, selectedMarket, setSelecte
     const btnStyle = {width: 60, height: 60, borderRadius: 2, bgcolor: "divider"}
 
     return (
-        <>
-            <Stack direction="row" spacing={2} p={2} overflow="auto" minWidth={800}>
+        <Box width="100%" overflow="auto">
+            <Stack direction="row" spacing={2} p={2} minWidth={800}>
                 <Tooltip title="Yeni market ekle">
                 <IconButton onClick={() => setOpen(true)} sx={btnStyle}>
                     <Add />
@@ -41,6 +41,6 @@ export default function Markets({markets, setMarkets, selectedMarket, setSelecte
                 })}
             </Stack>
             <MarketForm markets={markets} setMarkets={setMarkets} open={formOpen} setOpen={setOpen}/>
-        </>
+        </Box>
     );
 }
