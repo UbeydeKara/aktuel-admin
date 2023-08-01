@@ -52,7 +52,7 @@ export default function ImageUpdateForm({selectedRow, setSelectedRow, handleUpda
                         <Divider sx={{mt: 2}}>
                             <Chip label={subtitle + " " + (index + 1)}/>
                         </Divider>
-                        <img src={item || selectedRow} alt="sevde" style={{maxWidth: 500, borderRadius: 10}}/>
+                        <img src={item || selectedRow} alt="Görsel yüklenemedi" style={{maxWidth: 500, borderRadius: 10}}/>
                         <Stack direction="row" spacing={1} alignItems="center">
                             <Typography>Link: </Typography>
                             <TextField placeholder="Görsel (URL)" size="small" defaultValue={item}

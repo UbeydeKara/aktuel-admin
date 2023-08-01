@@ -31,7 +31,7 @@ export default function AutoCompleteField({field, label, values, setValues}) {
                 return option;
             }}
             renderOption={(props, option) =>
-                <img {...props} src={option} alt="Sevde" loading="lazy"/>}
+                <img {...props} src={option} alt="Görsel yüklenemedi" loading="lazy"/>}
 
             onChange={autoCompleteChange}
 

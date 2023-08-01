@@ -75,7 +75,7 @@ export default function MarketForm({open, setOpen, markets, setMarkets}) {
                              p={1.5}
                              borderRadius={2}
                             src={values.img_path}
-                            alt="Sevde"
+                            alt="Görsel yüklenemedi"
                             mr="auto"
                             height={50}
                             width={80}/>

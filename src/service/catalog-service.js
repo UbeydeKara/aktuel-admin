@@ -3,11 +3,13 @@ import http from "./http-common";
 const serviceUrl = "/catalog"
 
 const getAll = () => {
-    return http.get(serviceUrl);
+    return http.get(serviceUrl + "/findAll");
 };
 
 const findAllByMarket = (marketID) => {
-    return http.get(serviceUrl + "/market/" + marketID);
+    if (marketID !== "")
+        return http.get(serviceUrl + "/market/" + marketID);
+    return getAll();
 };
 
 const save = (catalog) => {
@@ -28,7 +30,6 @@ const deleteByIds = (catalogIds) => {
 }
 
 const CatalogService = {
-    getAll,
     findAllByMarket,
     save,
     update,

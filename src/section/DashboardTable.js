@@ -1,7 +1,9 @@
 import {useCallback, useState} from "react";
 import {DataGrid, trTR} from "@mui/x-data-grid";
-import {Box, Button, Stack} from "@mui/material";
+import {Box, Button, Stack, Typography} from "@mui/material";
 import moment from "moment/moment";
+import {Error} from "@mui/icons-material";
+import clsx from "clsx";
 
 export default function DashboardTable({data, handleUpdate, handleDelete, setSelectedRow, setRecordOpen}) {
     const [selectedRows, setSelectedRows] = useState([]);
@@ -12,18 +14,29 @@ export default function DashboardTable({data, handleUpdate, handleDelete, setSel
             valueFormatter: (params) => `${params.value.title}` },
         { field: 'images', headerName: 'Kataloglar', flex: 1, minWidth: 120,
             renderCell: (params) =>
-                <img src={params.value[0]} alt="Sevde" width="100%" style={{objectFit: "contain"}}
+                <img src={params.value[0]} alt="Görsel yüklenemedi" width="100%" style={{objectFit: "contain"}}
                      loading="lazy"/>},
         { field: 'products', headerName: 'Ürünler', flex: 1, minWidth: 120,
             renderCell: (params) =>
-                <img src={params.value[0]} alt="Sevde" width="100%" style={{objectFit: "contain"}}
-                     loading="lazy"/>},
+                params.value.length > 0 ?
+                <img src={params.value[0]} alt="Görsel yüklenemedi" width="100%" style={{objectFit: "contain"}}
+                     loading="lazy"/> :
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                        <Error fontSize="small"/>
+                        <span>Ürün yok</span>
+                    </Stack>
+        },
         { field: 'startAt', headerName: 'Kampanya Başlangıç', editable: true, flex: 1, minWidth: 150, type: 'date',
             valueFormatter: (params) =>
                 `${moment(params?.value).locale("tr").format('DD MMMM YYYY') || ''}` },
         { field: 'deadline', headerName: 'Kampanya Bitiş', editable: true, flex: 1, minWidth: 150, type: 'date',
             valueFormatter: (params) =>
-                `${moment(params?.value).locale("tr").format('DD MMMM YYYY') || ''}`}
+                `${moment(params?.value).locale("tr").format('DD MMMM YYYY') || ''}`,
+            cellClassName: (params) => {
+                return clsx('date', {
+                    negative: moment(params?.value).add(1, 'day') .isBefore()
+                })
+            },}
     ];
 
     const handleRowSelection = (e) => {
@@ -47,7 +60,11 @@ export default function DashboardTable({data, handleUpdate, handleDelete, setSel
     }, []);
 
     return (
-        <Box sx={{width: '100%'}}>
+        <Box sx={{
+            width: '100%',
+            '& .date.negative': {
+                color: 'red',
+            }}}>
             <DataGrid
                 localeText={trTR.components.MuiDataGrid.defaultProps.localeText}
                 rows={data}

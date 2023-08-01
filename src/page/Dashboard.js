@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {Badge, Fade, Typography} from "@mui/material";
 import UserAvatar from "../component/UserAvatar";
 import OverlayCard from "../component/OverlayCard";
@@ -22,20 +22,13 @@ export default function Dashboard() {
     const [recordIsOpen, setRecordOpen] = useState(false);
 
     // Markets
-    const [selectedMarket, setSelectedMarket] = useState({});
+    const [selectedMarket, setSelectedMarket] = useState("");
     const [markets, setMarkets] = useState([]);
 
     const handleData = async () => {
-        if(Object.keys(selectedMarket).length === 0)
-            return null;
-
         await CatalogService.findAllByMarket(selectedMarket).then(
             (res) => {
                 setData(res.data.data);
-            }
-        ).catch(
-            (res) => {
-                setAlert(true);
             }
         )
     };
@@ -43,13 +36,7 @@ export default function Dashboard() {
     const handleGetMarkets = async () => {
         await MarketService.getMarkets().then(
             (res) => {
-                const marketResponse = res.data.data;
-                setMarkets(marketResponse);
-                setSelectedMarket(marketResponse[0].marketID);
-            }
-        ).catch(
-            (err) => {
-                return Promise.reject([]);
+                setMarkets(res.data.data);
             }
         )
     };
