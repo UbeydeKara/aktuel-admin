@@ -7,9 +7,7 @@ const getAll = () => {
 };
 
 const findAllByMarket = (marketID) => {
-    if (marketID !== "")
-        return http.get(serviceUrl + "/market/" + marketID);
-    return getAll();
+    return http.get(serviceUrl + "/market/" + marketID);
 };
 
 const save = (catalog) => {
@@ -30,6 +28,7 @@ const deleteByIds = (catalogIds) => {
 }
 
 const CatalogService = {
+    getAll,
     findAllByMarket,
     save,
     update,

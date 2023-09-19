@@ -10,9 +10,14 @@ const save = (market) => {
     return http.post(serviceUrl + "/save", market);
 }
 
+const deleteById = (marketID) => {
+    return http.delete(serviceUrl + "/del/" + marketID);
+}
+
 const MarketService = {
     getMarkets,
-    save
+    save,
+    deleteById
 };
 
 export default MarketService;

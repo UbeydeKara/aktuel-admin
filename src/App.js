@@ -7,11 +7,15 @@ import '@fontsource/public-sans/700.css';
 
 import Router from "./section/Router";
 import ThemeProvider from "./theme";
+import {Provider} from "react-redux";
+import store from "./redux/store";
 
 export default function App() {
     return (
         <ThemeProvider>
-            <Router/>
+            <Provider store={store}>
+                <Router/>
+            </Provider>
         </ThemeProvider>
     );
 }

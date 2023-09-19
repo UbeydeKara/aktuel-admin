@@ -1,18 +1,31 @@
-const initialKey = "loggedUser";
-export default function useLocalStorage() {
+import PropTypes from "prop-types";
+import {useState} from "react";
 
-    const getValue = () => {
-        return JSON.parse(localStorage.getItem(initialKey));
+useLocalStorage.propTypes = {
+    key: PropTypes.string.isRequired,
+    initialValue: PropTypes.any
+}
+
+export default function useLocalStorage(key, initialValue) {
+
+    const currentValue = () => {
+        const valueInStorage = localStorage.getItem(key);
+
+        if (valueInStorage)
+            return JSON.parse(valueInStorage);
+
+        if (initialValue)
+            localStorage.setItem(key, JSON.stringify(initialValue));
+
+        return initialValue;
     }
 
+    const [value, setStateValue] = useState(currentValue());
+
     const setValue = (newValue) => {
-        const value = JSON.stringify(newValue);
-        localStorage.setItem(initialKey, value);
-    };
+        setStateValue(newValue);
+        localStorage.setItem(key, JSON.stringify(newValue));
+    }
 
-    const removeItem = () => {
-        localStorage.removeItem(initialKey);
-    };
-
-    return {getValue, setValue, removeItem};
+    return [value, setValue];
 }
