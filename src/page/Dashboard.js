@@ -1,130 +1,83 @@
 import * as React from 'react';
-import {useCallback, useEffect, useState} from 'react';
-import {Badge, Fade, Typography} from "@mui/material";
-import UserAvatar from "../component/UserAvatar";
-import OverlayCard from "../component/OverlayCard";
-import SweetAlert from "../component/SweetAlert";
-import {DashboardTable, ImageUpdateForm, Markets, Record} from "../section";
-import {CatalogService, MarketService} from "../service";
+import {useEffect, useState} from 'react';
+import {useDispatch} from "react-redux";
+import {Fade, Typography} from "@mui/material";
+import {getAllCatalogs} from "../redux/actions/CatalogAction";
+import {getAllMarkets} from "../redux/actions/MarketAction";
+import {OverlayCard, SweetAlert, UserAvatar} from "../component";
+import {DashboardTable, ImageUpdateForm, MarketForm, MarketMenu, Record} from "../section";
+import HelloDialog from "../section/dialogs/HelloDialog";
+import PushNotification from "../section/dialogs/PushNotification";
+import ActionMenu from "../section/ActionMenu";
 
 export default function Dashboard() {
 
     // image
     const [selectedRow, setSelectedRow] = useState({});
 
-    // alert
-    const [alertOpen, setAlert] = useState(false);
-
-    // data
-    const [data, setData] = useState([]);
-
     // Record
     const [recordIsOpen, setRecordOpen] = useState(false);
 
-    // Markets
-    const [selectedMarket, setSelectedMarket] = useState("");
-    const [markets, setMarkets] = useState([]);
+    // Notification
+    const [notifyIsOpen, setNotifyOpen] = useState(false);
 
-    const handleData = async () => {
-        await CatalogService.findAllByMarket(selectedMarket).then(
-            (res) => {
-                setData(res.data.data);
-            }
-        )
-    };
+    // Market Form
+    const [marketControl, setMarketControl] = useState({
+        open: false,
+        isEdit: false
+    });
 
-    const handleGetMarkets = async () => {
-        await MarketService.getMarkets().then(
-            (res) => {
-                setMarkets(res.data.data);
-            }
-        )
-    };
-
-    const handleSave = async (row) => {
-        const updateRequest = {...row, marketID: row.market.marketID}
-        await CatalogService.save(updateRequest).then(
-            (res) => {
-                const newState = [...data, res.data.data];
-                setData(newState);
-            }
-        ).catch(
-            (res) => {
-                setAlert(true);
-            }
-        )
-    }
-
-    const handleUpdate = async (row) => {
-        const updateRequest = {...row, marketID: row.market.marketID}
-        await CatalogService.update(updateRequest).then((res) => {
-            const newState = data.map(obj => {
-                if (obj.catalogID === updateRequest.catalogID)
-                    return res.data.data;
-                return obj;
-            });
-            setData(newState);
-        })
-    }
-
-    const handleDelete = async (selectedRows) => {
-        await CatalogService.deleteByIds(selectedRows).then(
-            (res) => {
-                setData(
-                    data.filter((r) => selectedRows.filter((sr) => sr === r.catalogID).length < 1)
-                );
-            }
-        ).catch(
-            (res) => {
-                setAlert(true);
-            }
-        )
-    }
+    const dispatch = useDispatch();
 
     useEffect(() => {
-        handleGetMarkets();
-    }, []);
-
-    useEffect(() => {
-        handleData();
-    }, [selectedMarket]);
+        dispatch(getAllMarkets());
+        dispatch(getAllCatalogs());
+    }, [dispatch]);
 
     return (
         <Fade in timeout={800}>
             <div style={{paddingBottom: 40}}>
                 <OverlayCard>
-                    <Badge badgeContent="Beta" color="info">
-                        <Typography variant="h4" color="white">Aktüel Dashboard</Typography>
-                    </Badge>
+                    {/*<Stack direction="row">*/}
+                    <Typography variant="h4" color="white">Aktüel Dashboard</Typography>
+                    {/*    <Divider orientation="vertical" flexItem sx={{color: "white", ml: 1}}/>*/}
+                    {/*    <Divider orientation="vertical" flexItem sx={{color: "white", mr: 1}}/>*/}
+                    {/*    <IconButton sx={{color: "white"}}>*/}
+                    {/*        <LightModeTwoTone/>*/}
+                    {/*    </IconButton>*/}
+                    {/*</Stack>*/}
                     <UserAvatar/>
                 </OverlayCard>
 
-                <Markets
-                    markets={markets}
-                    setMarkets={setMarkets}
-                    selectedMarket={selectedMarket}
-                    setSelectedMarket={setSelectedMarket}/>
+                <MarketMenu setMarketControl={setMarketControl}/>
+
+                <ActionMenu
+                    setNotifyOpen={setNotifyOpen}
+                    setRecordOpen={setRecordOpen}
+                    setMarketControl={setMarketControl}/>
 
                 <DashboardTable
-                    markets={markets}
-                    data={data}
-                    handleUpdate={handleUpdate}
-                    handleDelete={handleDelete}
-                    setSelectedRow={setSelectedRow}
-                    setRecordOpen={setRecordOpen}/>
+                    setSelectedRow={setSelectedRow}/>
+
+                <MarketForm
+                    marketControl={marketControl}
+                    setMarketControl={setMarketControl}/>
 
                 <Record
-                    markets={markets}
                     open={recordIsOpen}
-                    setOpen={setRecordOpen}
-                    handleSave={handleSave}/>
+                    setOpen={setRecordOpen}/>
 
                 <ImageUpdateForm
                     selectedRow={selectedRow}
-                    setSelectedRow={setSelectedRow}
-                    handleUpdate={handleUpdate}/>
+                    setSelectedRow={setSelectedRow}/>
 
-                <SweetAlert open={alertOpen} setOpen={setAlert} message="Sunucuya Bağlanılamadı"/>
+                <PushNotification open={notifyIsOpen} setOpen={setNotifyOpen}/>
+
+                <SweetAlert/>
+
+                <HelloDialog/>
+
+
             </div>
         </Fade>
     );
