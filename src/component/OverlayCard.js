@@ -3,7 +3,7 @@ import {Stack} from "@mui/material";
 const searchCard = {
     height: 200,
     background: '#172337',
-    backgroundImage: 'url(/static/bg.jpg)',
+    backgroundImage: 'url(http://37.148.212.156/static/bg.jpg)',
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
     backgroundSize: 'cover',

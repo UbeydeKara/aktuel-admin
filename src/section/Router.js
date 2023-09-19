@@ -4,15 +4,15 @@ import Login from "../page/Login";
 import Page from "./Page";
 import {useEffect} from "react";
 import useLocalStorage from "../hook/useLocalStorage";
+import {userExpired} from "../utils/auth";
 
 export default function Router() {
-    const {getValue} = useLocalStorage();
+    const [user] = useLocalStorage("loggedUser");
     const navigate = useNavigate();
     const location = useLocation()
 
     useEffect(() => {
-        const user = getValue();
-        if (user !== null) {
+        if (user && !userExpired(user)) {
             navigate("/dashboard");
         }
         else if(location.pathname !== "/login") {

@@ -1,12 +1,20 @@
-import {useCallback, useState} from "react";
+import * as React from "react";
+import {useCallback} from "react";
 import {DataGrid, trTR} from "@mui/x-data-grid";
-import {Box, Button, Stack} from "@mui/material";
+import {Box, Stack} from "@mui/material";
 import moment from "moment/moment";
-import {Error} from "@mui/icons-material";
+import {UnarchiveTwoTone} from "@mui/icons-material";
 import clsx from "clsx";
+import {useDispatch, useSelector} from "react-redux";
+import {setSelectedRows} from "../redux/actions/DataAction";
+import {setErrorImage} from "../utils/imageError";
+import {updateCatalog} from "../redux/actions/CatalogAction";
 
-export default function DashboardTable({data, handleUpdate, handleDelete, setSelectedRow, setRecordOpen}) {
-    const [selectedRows, setSelectedRows] = useState([]);
+export default function DashboardTable({setSelectedRow}) {
+    const {catalogs} = useSelector(state => state.catalogs);
+    const {selectedMarketId} = useSelector(state => state.markets);
+    const filteredCatalogs = catalogs.filter(x => !selectedMarketId || x.market.marketID === selectedMarketId);
+    const dispatch = useDispatch();
 
     const columns = [
         { field: 'catalogID', headerName: 'ID', flex: 1, minWidth: 120 },
@@ -15,14 +23,14 @@ export default function DashboardTable({data, handleUpdate, handleDelete, setSel
         { field: 'images', headerName: 'Kataloglar', flex: 1, minWidth: 120,
             renderCell: (params) =>
                 <img src={params.value[0]} alt="Görsel yüklenemedi" width="100%" style={{objectFit: "contain"}}
-                     loading="lazy"/>},
+                     loading="lazy" onError={setErrorImage}/>},
         { field: 'products', headerName: 'Ürünler', flex: 1, minWidth: 120,
             renderCell: (params) =>
                 params.value.length > 0 ?
                 <img src={params.value[0]} alt="Görsel yüklenemedi" width="100%" style={{objectFit: "contain"}}
-                     loading="lazy"/> :
+                     loading="lazy" onError={setErrorImage}/> :
                     <Stack direction="row" alignItems="center" spacing={1}>
-                        <Error fontSize="small"/>
+                        <UnarchiveTwoTone fontSize="small"/>
                         <span>Ürün yok</span>
                     </Stack>
         },
@@ -34,13 +42,13 @@ export default function DashboardTable({data, handleUpdate, handleDelete, setSel
                 `${moment(params?.value).locale("tr").format('DD MMMM YYYY') || ''}`,
             cellClassName: (params) => {
                 return clsx('date', {
-                    negative: moment(params?.value).add(1, 'day') .isBefore()
+                    negative: moment(params?.value).add(1, 'day').isBefore()
                 })
             },}
     ];
 
     const handleRowSelection = (e) => {
-        setSelectedRows(e);
+        dispatch(setSelectedRows(e));
     };
 
     const handleCellClick = (params) => {
@@ -50,7 +58,10 @@ export default function DashboardTable({data, handleUpdate, handleDelete, setSel
     }
 
     const updateRow = useCallback((newRow, oldRow) => {
-        handleUpdate(newRow);
+        dispatch(updateCatalog({
+            ...newRow,
+            marketID: newRow.market.marketID
+        }))
         return newRow;
     }, []);
 
@@ -66,8 +77,9 @@ export default function DashboardTable({data, handleUpdate, handleDelete, setSel
                 color: 'red',
             }}}>
             <DataGrid
+                sx={{bgcolor: "white", borderRadius: 4, boxShadow: 4}}
                 localeText={trTR.components.MuiDataGrid.defaultProps.localeText}
-                rows={data}
+                rows={filteredCatalogs}
                 columns={columns}
                 initialState={{
                     pagination: {
@@ -83,12 +95,6 @@ export default function DashboardTable({data, handleUpdate, handleDelete, setSel
                 disableRowSelectionOnClick
                 checkboxSelection
             />
-            <Stack direction="row" spacing={1} mt={2}>
-                <Button variant="outlined" onClick={() => setRecordOpen(true)}>Katalog Ekle</Button>
-                {selectedRows.length > 0 &&
-                    <Button variant="outlined" color="error"
-                            onClick={() => handleDelete(selectedRows)}>Seçilenleri Sil</Button>}
-            </Stack>
         </Box>
     )
 }

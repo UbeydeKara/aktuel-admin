@@ -1,22 +1,17 @@
-import {Alert, Button, Fade, Paper, Snackbar, Stack, TextField, Typography} from "@mui/material";
+import {Alert, Button, Fade, InputAdornment, Paper, Snackbar, Stack, TextField, Typography} from "@mui/material";
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import useLocalStorage from "../hook/useLocalStorage";
 import {ReactComponent as LoginVector} from '../asset/login.svg';
-
-const initial_user = {
-    id: 0,
-    username: "Ahmet Güven",
-    email: "ahmet",
-    password: "30151530"
-}
+import {login} from "../utils/auth";
+import {EmailOutlined, LoginOutlined, VpnKeyOutlined} from "@mui/icons-material";
 
 export default function Login() {
     const [email, setEmail] = useState();
     const [password, setPassword] = useState();
     const [open, setOpen] = useState(false);
     const navigate = useNavigate();
-    const {setValue} = useLocalStorage();
+    const [, setUser] = useLocalStorage("loggedUser");
 
     const handleInputChange = (event) => {
         const name = event.target.name;
@@ -29,8 +24,9 @@ export default function Login() {
     }
 
     const handleLogin = () => {
-        if (email === initial_user.email && password === initial_user.password) {
-            setValue(initial_user);
+        const user = login(email, password);
+        if (user) {
+            setUser(user);
             navigate("/dashboard");
         } else {
             setOpen(true);
@@ -56,15 +52,34 @@ export default function Login() {
                     <Paper variant="sweet" elevation={4} sx={{width: {xs: "75%", sm: "50%"}, height: "100%"}}>
                         <LoginVector/>
                     </Paper>
-                    <Stack sx={{width: {sm: "50%"}, px: {sm: 8}}} spacing={1}>
-                        <Typography variant="h2">Aktüel Admin</Typography>
+                    <Stack sx={{width: {sm: "50%"}, px: {sm: 8}}} spacing={2}>
+
+                        <Typography variant="h2">Aktüel Dashboard</Typography>
+
+                        <TextField placeholder="Email"
+                                   size="small"
+                                   name="email"
+                                   onChange={handleInputChange}
+                                   InputProps={{
+                                       startAdornment: (<InputAdornment position="start">
+                                           <EmailOutlined/>
+                                       </InputAdornment>)
+                                   }}/>
+
+                        <TextField placeholder="Şifre"
+                                   size="small"
+                                   type="password"
+                                   name="pass"
+                                   onChange={handleInputChange}
+                                   InputProps={{
+                                       startAdornment: (<InputAdornment position="start">
+                                           <VpnKeyOutlined/>
+                                       </InputAdornment>)
+                                   }}/>
                         <br/>
-                        <TextField placeholder="Email" size="small"
-                                   name="email" onChange={handleInputChange}/>
-                        <TextField placeholder="Şifre" size="small" type="password"
-                                   name="pass" onChange={handleInputChange}/>
-                        <br/>
-                        <Button variant="contained" onClick={handleLogin}>Giriş</Button>
+
+                        <Button variant="contained" onClick={handleLogin} startIcon={<LoginOutlined/>}>Giriş</Button>
+
                     </Stack>
                     <Snackbar open={open} autoHideDuration={5000} onClose={handleClose}>
                         <Alert severity="warning" onClose={handleClose}>

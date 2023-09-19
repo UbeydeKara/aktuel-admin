@@ -10,10 +10,10 @@ import useLocalStorage from "../hook/useLocalStorage";
 export default function BasicMenu({anchorEl, setAnchorEl}) {
     const open = Boolean(anchorEl);
     const navigate = useNavigate();
-    const {removeItem} = useLocalStorage();
+    const [, setUser] = useLocalStorage("loggedUser");
 
     const handleLogout = () => {
-        removeItem();
+        setUser(null);
         navigate("/login");
     }
 

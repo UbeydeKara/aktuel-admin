@@ -6,14 +6,14 @@ import useLocalStorage from "../hook/useLocalStorage";
 
 export default function UserAvatar() {
     const [anchorEl, setAnchorEl] = useState(null);
-    const {getValue} = useLocalStorage();
+    const [user] = useLocalStorage("loggedUser");
 
     return(
         <ButtonBase sx={{p: 1, borderRadius: 10}}>
             <Stack direction="row" spacing={1} alignItems="center"
                    onClick={e => setAnchorEl(e.currentTarget)}>
                 <Avatar src="/static/profile.png"/>
-                <Typography color="white">{getValue()?.username}</Typography>
+                <Typography color="white">{user.username}</Typography>
             </Stack>
             <BasicMenu anchorEl={anchorEl} setAnchorEl={setAnchorEl}/>
         </ButtonBase>
